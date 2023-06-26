@@ -481,7 +481,7 @@ public class TareaDocenteVinculacionService {
                         baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(),
                         fileRequest, FileRequest.class);
             }
-
+            Integer codigoTareaIndicador=0;
             for (Docente docente : tareaDocenteProyecto.getDocentes()) {
                 TareaDocenteVinculacion t = new TareaDocenteVinculacion();
                 t.setEstadoTareaDocente(EstadoTareaDocenteEnum.ASIGNADA.getValue());
@@ -491,7 +491,9 @@ public class TareaDocenteVinculacionService {
 
                 List<TareaIndicador> tareaIndicadors = new ArrayList<>();
                 for (Indicador indicador : tareaDocenteProyecto.getIndicadors()) {
+                    codigoTareaIndicador++;
                     TareaIndicador indicadorBD = new TareaIndicador();
+                    indicadorBD.setCodigoTareaIndicador(codigoTareaIndicador);
                     indicadorBD.setFechaCreacionIndicador(new Date());
                     indicadorBD.setIndicadorCODIGOINDICADOR(indicador);
                     indicadorBD.setDescripcionTareaIndicador(indicador.getDescripcionIndicador());
@@ -564,6 +566,7 @@ public class TareaDocenteVinculacionService {
                     // this.tareaIndicadorDao.save(indicadorBD);
                 }
                 //TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
+                t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
 
                 // emservice.enviarCorreo(docente.getCorreoDocente(),
@@ -590,7 +593,7 @@ public class TareaDocenteVinculacionService {
                     baseURLs.getGprStorageURL() + "/saveFile/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
                     FileRequest.class);
         }
-
+        tareaDocente.setTareaIndicadorList(tareaIndicadors);
         // for (TareaIndicador tIndicador : tareaIndicadors)
         //     this.tareaIndicadorDao.save(tIndicador);
 
@@ -615,7 +618,7 @@ public class TareaDocenteVinculacionService {
         // emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
         //         "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
         //         "Su Actividad ha sido aprobada: ");
-        // this.tareaDocenteDao.save(tareaDocente);
+        this.tareaDocenteDao.save(tareaDocente);
     }
 
     public void denegarTareaDocente(TareaDocenteVinculacion tareaDocente) {
