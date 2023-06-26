@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteVinculacion;
+import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareaIndicador;
 import ec.edu.espe.gpr.vinculacion.services.TareaDocenteVinculacionService;
 import lombok.RequiredArgsConstructor;
 
@@ -155,15 +156,15 @@ public class TareaDocenteRestController {
     //     }
     // }
 
-    // @GetMapping(path = "/listarTareasEntregadas/{idDocente}")
-    // public ResponseEntity<List<TareaDocente>> listarTareasEntregadas(@PathVariable String idDocente) {
-    //     try {
-    //         List<TareaDocente> tareaDocentes = this.tareaDocenteService.listarTareasEntregadas(idDocente);
-    //         return ResponseEntity.ok(tareaDocentes);
-    //     } catch (Exception e) {
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @GetMapping(path = "/listarTareasEntregadas/{idDocente}")
+    public ResponseEntity<List<TareaDocenteVinculacion>> listarTareasEntregadas(@PathVariable String idDocente) {
+        try {
+            List<TareaDocenteVinculacion> tareaDocentes = this.tareaDocenteService.listarTareasEntregadas(idDocente);
+            return ResponseEntity.ok(tareaDocentes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     // @GetMapping(path = "/listarTareasAceptadas")
     // public ResponseEntity<List<TareaDocente>> listarTareasAceptadas() {
@@ -304,54 +305,54 @@ public class TareaDocenteRestController {
         }
     }
 
-    // @PutMapping("/guardarTareaAsignadaAlProfesor")
-    // public ResponseEntity<TareaDocente> guardarTareaAsignadaAlProfesor(
-    //     @RequestParam("tareaIndicadors") String strTareaIndicadors, @RequestParam("codigoTareaDocente") String codigoTareaDocente) {
-    //     try {
-    //         MultipartFile file = null;
-    //         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
-    //         List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, new TypeToken<List<TareaIndicador>>(){}.getType());
-    //         this.tareaDocenteService.guardarTareaAsignadaAlProfesor(tareaIndicadors,file,Integer.parseInt(codigoTareaDocente));
-    //         return ResponseEntity.ok().build();
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @PutMapping("/guardarTareaAsignadaAlProfesor")
+    public ResponseEntity<String> guardarTareaAsignadaAlProfesor(
+        @RequestParam("tareaIndicadors") String strTareaIndicadors, @RequestParam("idTareaDocente") String id) {
+        try {
+            MultipartFile file = null;
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
+            List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, new TypeToken<List<TareaIndicador>>(){}.getType());
+            this.tareaDocenteService.guardarTareaAsignadaAlProfesor(tareaIndicadors,file,id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
-    // @PutMapping("/guardarArchivoTareaAsignadaAlProfesor")
-    // public ResponseEntity<String> guardarArchivoTareaAsignadaAlProfesor(@RequestParam("file") MultipartFile file,
-    //         @RequestParam("tareaIndicadors") String strTareaIndicadors, @RequestParam("codigoTareaDocente") String codigoTareaDocente) {
-    //     try {
-    //         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
-    //         //List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, TareaIndicador[].class);
-    //         List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, new TypeToken<List<TareaIndicador>>(){}.getType());
-    //         this.tareaDocenteService.guardarTareaAsignadaAlProfesor(tareaIndicadors,file,Integer.parseInt(codigoTareaDocente));
-    //         return ResponseEntity.ok().build();
-    //     } catch (Exception e) {
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @PutMapping("/guardarArchivoTareaAsignadaAlProfesor")
+    public ResponseEntity<String> guardarArchivoTareaAsignadaAlProfesor(@RequestParam("file") MultipartFile file,
+            @RequestParam("tareaIndicadors") String strTareaIndicadors, @RequestParam("codigoTareaDocente") String id) {
+        try {
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
+            //List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, TareaIndicador[].class);
+            List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, new TypeToken<List<TareaIndicador>>(){}.getType());
+            this.tareaDocenteService.guardarTareaAsignadaAlProfesor(tareaIndicadors,file,id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
-    // @PutMapping("/aprobarTareaDocente")
-    // public ResponseEntity<String> aprobarTareaDocente(@RequestBody TareaDocente tareaDocente) {
-    //     try {
-    //         this.tareaDocenteService.aprobarTareaDocente(tareaDocente);
-    //         return ResponseEntity.ok().build();
-    //     } catch (Exception e) {
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @PutMapping("/aprobarTareaDocente")
+    public ResponseEntity<String> aprobarTareaDocente(@RequestBody TareaDocenteVinculacion tareaDocente) {
+        try {
+            this.tareaDocenteService.aprobarTareaDocente(tareaDocente);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
-    // @PutMapping("/denegarTareaDocente")
-    // public ResponseEntity<String> denegarTareaDocente(@RequestBody TareaDocente tareaDocente) {
-    //     try {
-    //         this.tareaDocenteService.denegarTareaDocente(tareaDocente);
-    //         return ResponseEntity.ok().build();
-    //     } catch (Exception e) {
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @PutMapping("/denegarTareaDocente")
+    public ResponseEntity<String> denegarTareaDocente(@RequestBody TareaDocenteVinculacion tareaDocente) {
+        try {
+            this.tareaDocenteService.denegarTareaDocente(tareaDocente);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @DeleteMapping("/eliminarTarea/{codigoTarea}")
     public ResponseEntity<String> eliminarTarea(@PathVariable String codigoTarea) {

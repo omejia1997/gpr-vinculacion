@@ -9,5 +9,6 @@ import ec.edu.espe.gpr.vinculacion.model.TareaDocenteVinculacion;
 
 public interface TareaDocenteDao extends MongoRepository<TareaDocenteVinculacion, String> {
     List<TareaDocenteVinculacion> findByTareaId(String idTarea);
-    List<TareaDocenteVinculacion> findByDocenteCodigoDocente(Integer codDocente);
+    List<TareaDocenteVinculacion> findByDocenteCodigoDocente(Integer codDocente);   
+    List<TareaDocenteVinculacion> findByEstadoTareaDocenteAndCedulaDocenteRevisor(String estadoTareaDocente,String cedulaDocenteRevisor);
 }

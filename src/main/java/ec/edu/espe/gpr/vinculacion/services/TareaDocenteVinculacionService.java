@@ -282,10 +282,10 @@ public class TareaDocenteVinculacionService {
     // }
 
 
-    // public List<TareaDocente> listarTareasEntregadas(String cedulaDocenteRevisor) {
-    //     return this.tareaDocenteDao.findByEstadoTareaDocenteAndCedulaDocenteRevisor(
-    //             EstadoTareaDocenteEnum.EN_REVISION.getText(), cedulaDocenteRevisor);
-    // }
+    public List<TareaDocenteVinculacion> listarTareasEntregadas(String cedulaDocenteRevisor) {
+        return this.tareaDocenteDao.findByEstadoTareaDocenteAndCedulaDocenteRevisor(
+                EstadoTareaDocenteEnum.EN_REVISION.getText(), cedulaDocenteRevisor);
+    }
 
     // public List<TareaDocente> listarTareasAceptadas() {
     //     return this.tareaDocenteDao.findByEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getText());
@@ -578,52 +578,53 @@ public class TareaDocenteVinculacionService {
         return new TareaDocenteVinculacion();
     }
 
-    // public void guardarTareaAsignadaAlProfesor(List<TareaIndicador> tareaIndicadors, MultipartFile file,
-    //         Integer codigoTareaDocente) {
-    //     TareaDocente tareaDocente = this.obtenerIndicadorPorCodigoTareaDocente(codigoTareaDocente);
-    //     if (file != null) {
-    //         tareaDocente.setArchivoTareaDocente(tareaDocente.getCodigoTareaDocente().toString() + ".pdf");// Revisar
-    //         tareaDocente.setNombreArchivoTareaDocente(file.getOriginalFilename());
+    public void guardarTareaAsignadaAlProfesor(List<TareaIndicador> tareaIndicadors, MultipartFile file,
+            String id) {
+        TareaDocenteVinculacion tareaDocente = this.tareaDocenteDao.findById(id).get();
+        if (file != null) {
+            tareaDocente.setNombreArchivoTareaDocenteEnStorage(tareaDocente.getId() + ".pdf");// Revisar
+            tareaDocente.setNombreArchivoTareaDocente(file.getOriginalFilename());
 
-    //         FileRequest fileRequest = new FileRequest(file, tareaDocente.getArchivoTareaDocente());
-    //         this.restTemplate.postForObject(
-    //                 baseURLs.getGprStorageURL() + "/saveFile/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
-    //                 FileRequest.class);
-    //         // this.saveFile(file, tareaDocente.getArchivoTareaDocente());
-    //     }
+            FileRequest fileRequest = new FileRequest(file, tareaDocente.getNombreArchivoTareaDocenteEnStorage());
+            this.restTemplate.postForObject(
+                    baseURLs.getGprStorageURL() + "/saveFile/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
+                    FileRequest.class);
+        }
 
-    //     for (TareaIndicador tIndicador : tareaIndicadors)
-    //         this.tareaIndicadorDao.save(tIndicador);
+        // for (TareaIndicador tIndicador : tareaIndicadors)
+        //     this.tareaIndicadorDao.save(tIndicador);
 
-    //     tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.EN_REVISION.getValue());
-    //     this.tareaDocenteDao.save(tareaDocente);
-    //     Tarea tarea = tareaDocente.getCodigoTarea();
-    //     tarea.setEstadoTarea(EstadoTareaEnum.INACTIVE.getValue().charAt(0));
-    //     this.tareaDao.save(tarea);
-    //     Docente docenteRevisor = this.docenteDao.findByCedulaDocente(tarea.getIdDocenteRevisor());
-    //     emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
-    //             "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-    //             "La Actividad perteneciente a: " + tareaDocente.getCodigoDocente().getNombreDocente() + " " +
-    //                     tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
+        tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.EN_REVISION.getValue());
+        this.tareaDocenteDao.save(tareaDocente);
+        // Tarea tarea = tareaDocente.getCodigoTarea();
+        // tarea.setEstadoTarea(EstadoTareaEnum.INACTIVE.getValue().charAt(0));
+        // this.tareaDao.save(tarea);
 
-    // }
+        /*//Comprobar para mail
+        Docente docenteRevisor = this.docenteDao.findByCedulaDocente(tarea.getIdDocenteRevisor());
+        emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
+                "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
+                "La Actividad perteneciente a: " + tareaDocente.getCodigoDocente().getNombreDocente() + " " +
+                        tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
+        */
+    }
 
 
-    // public void aprobarTareaDocente(TareaDocente tareaDocente) {
-    //     tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getValue());
-    //     emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
-    //             "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-    //             "Su Actividad ha sido aprobada: ");
-    //     this.tareaDocenteDao.save(tareaDocente);
-    // }
+    public void aprobarTareaDocente(TareaDocenteVinculacion tareaDocente) {
+        tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getValue());
+        // emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
+        //         "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
+        //         "Su Actividad ha sido aprobada: ");
+        // this.tareaDocenteDao.save(tareaDocente);
+    }
 
-    // public void denegarTareaDocente(TareaDocente tareaDocente) {
-    //     tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.DENEGADO.getValue());
-    //     emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
-    //             "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-    //             "Su Actividad ha sido Denegada: ");
-    //     this.tareaDocenteDao.save(tareaDocente);
-    // }
+    public void denegarTareaDocente(TareaDocenteVinculacion tareaDocente) {
+        tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.DENEGADO.getValue());
+        // emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
+        //         "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
+        //         "Su Actividad ha sido Denegada: ");
+        this.tareaDocenteDao.save(tareaDocente);
+    }
 
     public void eliminarTarea(String codigoTarea) {
         TareaVinculacion tarea = this.obtenerTareaPorCodigoTarea(codigoTarea);
