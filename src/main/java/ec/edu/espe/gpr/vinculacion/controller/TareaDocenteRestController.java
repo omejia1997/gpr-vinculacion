@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareaIndicador;
+import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareasRealizadas;
 import ec.edu.espe.gpr.vinculacion.services.TareaDocenteVinculacionService;
 import lombok.RequiredArgsConstructor;
 
@@ -35,15 +36,15 @@ public class TareaDocenteRestController {
     @Autowired
     private TareaDocenteVinculacionService tareaDocenteService;
 
-    // @GetMapping(path = "/listarTareasDocentePorIdTarea/{id}")
-    // public ResponseEntity<List<TareaDocente>> listarTareasDocentePorCodigoTarea(@PathVariable String id) {
-    //     try {
-    //         List<TareaDocente> tareas = this.tareaDocenteService.listarTareasDocentePorCodigoTarea(id);
-    //         return ResponseEntity.ok(tareas);
-    //     } catch (Exception e) {
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @GetMapping(path = "/listarTareasDocentePorCodigoTarea/{id}")
+    public ResponseEntity<List<TareaDocenteVinculacion>> listarTareasDocentePorCodigoTarea(@PathVariable String id) {
+        try {
+            List<TareaDocenteVinculacion> tareas = this.tareaDocenteService.listarTareasDocentePorCodigoTarea(id);
+            return ResponseEntity.ok(tareas);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     // @GetMapping(path = "/listarTareas/{idDocente}")
     // public ResponseEntity<List<TareaDocenteProyecto>> listarTareas(@PathVariable String idDocente) {
@@ -206,15 +207,15 @@ public class TareaDocenteRestController {
     //     }
     // }
 
-    // @GetMapping(path = "/listarTodasTareasRevisadas")
-    // public ResponseEntity<List<TareasRealizadas>> listarTodasTareasRevisadas() {
-    //     try {
-    //         List<TareasRealizadas> tareaDocentes = this.tareaDocenteService.listarTodasTareasRevisadas();
-    //         return ResponseEntity.ok(tareaDocentes);
-    //     } catch (Exception e) {
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @GetMapping(path = "/listarTodasTareasRevisadas")
+    public ResponseEntity<List<TareasRealizadas>> listarTodasTareasRevisadas() {
+        try {
+            List<TareasRealizadas> tareaDocentes = this.tareaDocenteService.listarTodasTareasRevisadas();
+            return ResponseEntity.ok(tareaDocentes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     
     @PostMapping(path = "/crearTarea")

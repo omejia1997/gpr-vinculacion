@@ -32,10 +32,12 @@ import ec.edu.espe.gpr.vinculacion.model.TareaVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardProyectoInvestigacion;
 import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardTareaInvestigacion;
 import ec.edu.espe.gpr.vinculacion.model.dashboard.Series;
+import ec.edu.espe.gpr.vinculacion.model.file.FileModel;
 import ec.edu.espe.gpr.vinculacion.model.file.FileRequest;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.Docente;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.Indicador;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareaIndicador;
+import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareasRealizadas;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TipoProceso;
 
 @Service
@@ -115,11 +117,11 @@ public class TareaDocenteVinculacionService {
      * }
      */
 
-    // public List<TareaDocente> listarTareasDocentePorCodigoTarea(String idTarea) {
-    //     Tarea tarea = this.obtenerTareaPorCodigoTarea(idTarea);
-    //    // return this.tareaDocenteDao.findByCodigoTarea(tarea);
-    //    return tarea.getTareaDocenteList();
-    // }
+    public List<TareaDocenteVinculacion> listarTareasDocentePorCodigoTarea(String idTarea) {
+       return this.tareaDocenteDao.findByTareaId(idTarea);
+       // return this.tareaDocenteDao.findByCodigoTarea(tarea);
+       // return tarea.getTareaDocenteList();
+    }
 
     public List<TareaDocenteProyectoVinculacion> listarTodasTareasPorProyecto(String idProyecto) {
         List<TareaDocenteProyectoVinculacion> tListDocenteProyecto = new ArrayList<>();
@@ -326,42 +328,43 @@ public class TareaDocenteVinculacionService {
     //     return this.tareaDocenteDao.findByEstadoTareaDocente(EstadoTareaDocenteEnum.EN_REVISION.getValue());
     // }
 
-    // public List<TareasRealizadas> listarTodasTareasRevisadas() {
-    //     List<TareaDocente> tareaDocentes = this.tareaDocenteDao
-    //             .findByEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getValue());
-    //     List<TareasRealizadas> tRealizadas = new ArrayList<>();
-    //     for (TareaDocente tareaDocente : tareaDocentes) {
-    //         TareasRealizadas tRealizada = new TareasRealizadas();
-    //         tRealizada.setNombreDocenteRevisor(tareaDocente.getCodigoTarea().getNombreDocenteRevisor());
-    //         tRealizada.setTipoTarea(tareaDocente.getCodigoTarea().getTipoTarea());
-    //         tRealizada.setTipoProceso(
-    //                 tareaDocente.getCodigoTarea().getCodigoProyecto().getTipoProceso().getNombreTipoProceso());
-    //         tRealizada.setNombreProyecto(tareaDocente.getCodigoTarea().getCodigoProyecto().getNombreProyecto());
-    //         tRealizada.setNombreTarea(tareaDocente.getCodigoTarea().getNombreTarea());
-    //         tRealizada.setPrioridadTarea(tareaDocente.getCodigoTarea().getPrioridadTarea());
-    //         tRealizada.setPesoTarea(tareaDocente.getCodigoTarea().getValorPesoTarea() + " "
-    //                 + tareaDocente.getCodigoTarea().getPesoTarea());
-    //         tRealizada.setFechaCreaciontarea(tareaDocente.getCodigoTarea().getFechaCreaciontarea());
-    //         tRealizada.setFechaEntregaTarea(tareaDocente.getCodigoTarea().getFechaEntregaTarea());
-    //         tRealizada.setResponsable(tareaDocente.getCodigoDocente().getNombreDocente() + " "
-    //                 + tareaDocente.getCodigoDocente().getApellidoDocente());
-    //         tRealizada.setTareaIndicadors(this.tareaIndicadorDao.findByTareadocenteCODIGOTAREADOCENTE(tareaDocente));
-    //         if (tareaDocente.getNombreArchivoTareaDocente() != ""
-    //                 || tareaDocente.getNombreArchivoTareaDocente() != null) {
-    //             tRealizada.setNombreArchivo(tareaDocente.getNombreArchivoTareaDocente());
-    //             ResponseEntity<FileModel> response = this.restTemplate.getForEntity(
-    //                     baseURLs.getGprStorageURL() + "/getFileDocenteTarea/"
-    //                             + tareaDocente.getNombreArchivoTareaDocente() + "/"
-    //                             + tareaDocente.getArchivoTareaDocente(),
-    //                     FileModel.class);
-    //             FileModel fileModel = response.getBody();
+    public List<TareasRealizadas> listarTodasTareasRevisadas() {
+        List<TareaDocenteVinculacion> tareaDocentes = this.tareaDocenteDao
+                .findByEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getValue());
+        List<TareasRealizadas> tRealizadas = new ArrayList<>();
+        for (TareaDocenteVinculacion tareaDocente : tareaDocentes) {
+            TareasRealizadas tRealizada = new TareasRealizadas();
+            tRealizada.setNombreDocenteRevisor(tareaDocente.getTarea().getNombreDocenteRevisor());
+            // tRealizada.setTipoProceso(
+            //         tareaDocente.getTarea().getProyecto().getTipoProceso().getNombreTipoProceso());
+            tRealizada.setNombreProyecto(tareaDocente.getTarea().getProyecto().getNombreProyecto());
+            tRealizada.setNombreTarea(tareaDocente.getTarea().getNombreTarea());
+            //tRealizada.setPrioridadTarea(tareaDocente.getTarea().getPrioridadTarea());
+            // tRealizada.setPesoTarea(tareaDocente.getTarea().getValorPesoTarea() + " "
+            //         + tareaDocente.getTarea().getPesoTarea());
+            tRealizada.setFechaCreaciontarea(tareaDocente.getTarea().getFechaCreaciontarea());
+            tRealizada.setFechaEntregaTarea(tareaDocente.getTarea().getFechaEntregaTarea());
+            tRealizada.setResponsable(tareaDocente.getDocente().getNombreDocente() + " "
+                    + tareaDocente.getDocente().getApellidoDocente());
+            // tRealizada.setTareaIndicadors(this.tareaIndicadorDao.findByTareadocenteCODIGOTAREADOCENTE(tareaDocente));
+            tRealizada.setTareaIndicadors(tareaDocente.getTareaIndicadorList());
 
-    //             tRealizada.setUrlArchivo(fileModel.getUrl());
-    //         }
-    //         tRealizadas.add(tRealizada);
-    //     }
-    //     return tRealizadas;
-    // }
+            if (tareaDocente.getNombreArchivoTareaDocente() != ""
+                    || tareaDocente.getNombreArchivoTareaDocente() != null) {
+                tRealizada.setNombreArchivo(tareaDocente.getNombreArchivoTareaDocente());
+                ResponseEntity<FileModel> response = this.restTemplate.getForEntity(
+                        baseURLs.getGprStorageURL() + "/getFileDocenteTarea/"
+                                + tareaDocente.getNombreArchivoTareaDocente() + "/"
+                                + tareaDocente.getNombreArchivoTareaDocenteEnStorage(),
+                        FileModel.class);
+                FileModel fileModel = response.getBody();
+
+                tRealizada.setUrlArchivo(fileModel.getUrl());
+            }
+            tRealizadas.add(tRealizada);
+        }
+        return tRealizadas;
+    }
 
     public void crear(TareaDocenteProyectoVinculacion tareaDocenteProyecto, MultipartFile file) {
         tareaDocenteProyecto.getTarea().setFechaCreaciontarea(new Date());
