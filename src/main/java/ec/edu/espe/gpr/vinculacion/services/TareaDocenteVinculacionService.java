@@ -29,8 +29,8 @@ import ec.edu.espe.gpr.vinculacion.model.ProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.TareaVinculacion;
-import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardProyectoInvestigacion;
-import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardTareaInvestigacion;
+import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardProyectoVinculacion;
+import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardTareaVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.dashboard.Series;
 import ec.edu.espe.gpr.vinculacion.model.file.FileModel;
 import ec.edu.espe.gpr.vinculacion.model.file.FileRequest;
@@ -174,99 +174,96 @@ public class TareaDocenteVinculacionService {
         return tListDocenteProyecto;
     }
 
-    // public List<DashboardProyectoInvestigacion> obtenerDatosProyectoDashboardInvestigacion(Integer idProceso) {
-    //     // TipoProceso tipoProceso = this.tipoProcesoDao.findById(idProceso).get();
-    //     // List<Proyecto> proyectos = this.proyectoDao.findByTipoProceso(tipoProceso);
-    //     List<Proyecto> proyectos = new ArrayList<>();//cambiar a Petición Get
-    //     List<DashboardProyectoInvestigacion> listDataDashboard = new ArrayList<>();
-    //     Double contProyecto;
-    //     Double contadorTotalProyecto;
-    //     Double contTotaltareas;
-    //     Double contTareas;
+    public List<DashboardProyectoVinculacion> obtenerDatosProyectoDashboardVinculacion() {
+        List<ProyectoVinculacion> proyectos = this.proyectoDao.findAll();
+        List<DashboardProyectoVinculacion> listDataDashboard = new ArrayList<>();
+        Double contProyecto;
+        Double contadorTotalProyecto;
+        Double contTotaltareas;
+        Double contTareas;
 
-    //     List<DashboardTareaInvestigacion> dashboardTareaInvestigacionList = null;
-    //     ;
-    //     for (Proyecto proyecto : proyectos) {
-    //         contadorTotalProyecto = 0.0;
-    //         contProyecto = 0.0;
-    //         DashboardProyectoInvestigacion dashboardProyectoInvestigacion = new DashboardProyectoInvestigacion();
-    //         dashboardProyectoInvestigacion.setProyecto(proyecto);
-    //         dashboardTareaInvestigacionList = new ArrayList<>();
-    //         Integer contTareasPorProyecto = 0;
-    //         for (Tarea tarea : proyecto.getTareaList()) {
+        List<DashboardTareaVinculacion> dashboardTareaInvestigacionList = null;
+        for (ProyectoVinculacion proyecto : proyectos) {
+            contadorTotalProyecto = 0.0;
+            contProyecto = 0.0;
+            DashboardProyectoVinculacion dashboardProyectoInvestigacion = new DashboardProyectoVinculacion();
+            dashboardProyectoInvestigacion.setProyecto(proyecto);
+            dashboardTareaInvestigacionList = new ArrayList<>();
+            Integer contTareasPorProyecto = 0;
+            for (TareaVinculacion tarea : this.tareaDao.findByProyecto(proyecto)) {
 
-    //             contTotaltareas = 0.0;
-    //             contTareas = 0.0;
-    //             contTareasPorProyecto++;
+                contTotaltareas = 0.0;
+                contTareas = 0.0;
+                contTareasPorProyecto++;
 
-    //             Integer contTareaAsignada = 0;
-    //             Integer contTareaRevision = 0;
-    //             Integer contTareaDenegado = 0;
+                Integer contTareaAsignada = 0;
+                Integer contTareaRevision = 0;
+                Integer contTareaDenegado = 0;
 
-    //             DashboardTareaInvestigacion dashboardTareaInvestigacion = new DashboardTareaInvestigacion();
-    //             Boolean check = true;
+                DashboardTareaVinculacion dashboardTareaInvestigacion = new DashboardTareaVinculacion();
+                Boolean check = true;
 
-    //             for (TareaDocente tareaDocente : tarea.getTareaDocenteList()) {
-    //                 if (check) {
-    //                     dashboardTareaInvestigacion.setTareaIndicadorList(tareaDocente.getTareaIndicadorList());
-    //                     check = false;
-    //                 }
-    //                 if (tareaDocente.getEstadoTareaDocente().equals("ACEPTADO")) {
-    //                     contProyecto++;
-    //                     contTareas++;
-    //                 }
-    //                 if (tareaDocente.getEstadoTareaDocente().equals("ASIGNADA"))
-    //                     contTareaAsignada++;
-    //                 if (tareaDocente.getEstadoTareaDocente().equals("EN REVISIÓN"))
-    //                     contTareaRevision++;
-    //                 if (tareaDocente.getEstadoTareaDocente().equals("DENEGADO"))
-    //                     contTareaDenegado++;
+                for (TareaDocenteVinculacion tareaDocente : this.tareaDocenteDao.findByTareaId(tarea.getId())) {
+                    if (check) {
+                        dashboardTareaInvestigacion.setTareaIndicadorList(tareaDocente.getTareaIndicadorList());
+                        check = false;
+                    }
+                    if (tareaDocente.getEstadoTareaDocente().equals("ACEPTADO")) {
+                        contProyecto++;
+                        contTareas++;
+                    }
+                    if (tareaDocente.getEstadoTareaDocente().equals("ASIGNADA"))
+                        contTareaAsignada++;
+                    if (tareaDocente.getEstadoTareaDocente().equals("EN REVISIÓN"))
+                        contTareaRevision++;
+                    if (tareaDocente.getEstadoTareaDocente().equals("DENEGADO"))
+                        contTareaDenegado++;
 
-    //                 contadorTotalProyecto++;
-    //                 contTotaltareas++;
+                    contadorTotalProyecto++;
+                    contTotaltareas++;
 
-    //             }
-    //             List<Series> series = new ArrayList<>();
+                }
+                List<Series> series = new ArrayList<>();
 
-    //             Series seriesModel = new Series();
-    //             seriesModel.setName("ASIGNADA");
-    //             seriesModel.setValue(contTareaAsignada);
+                Series seriesModel = new Series();
+                seriesModel.setName("ASIGNADA");
+                seriesModel.setValue(contTareaAsignada);
 
-    //             series.add(seriesModel);
+                series.add(seriesModel);
 
-    //             seriesModel = new Series();
-    //             seriesModel.setName("EN REVISIÓN\"");
-    //             seriesModel.setValue(contTareaRevision);
+                seriesModel = new Series();
+                seriesModel.setName("EN REVISIÓN\"");
+                seriesModel.setValue(contTareaRevision);
 
-    //             series.add(seriesModel);
+                series.add(seriesModel);
 
-    //             seriesModel = new Series();
-    //             seriesModel.setName("DENEGADO");
-    //             seriesModel.setValue(contTareaDenegado);
+                seriesModel = new Series();
+                seriesModel.setName("DENEGADO");
+                seriesModel.setValue(contTareaDenegado);
 
-    //             series.add(seriesModel);
+                series.add(seriesModel);
 
-    //             seriesModel = new Series();
-    //             seriesModel.setName("ACEPTADO");
-    //             seriesModel.setValue(contTareas.intValue());
+                seriesModel = new Series();
+                seriesModel.setName("ACEPTADO");
+                seriesModel.setValue(contTareas.intValue());
 
-    //             series.add(seriesModel);
+                series.add(seriesModel);
 
-    //             dashboardTareaInvestigacion.setName(contTareasPorProyecto + "." + tarea.getNombreTarea());
-    //             dashboardTareaInvestigacion.setValue((contTareas / contTotaltareas) * 100);
-    //             dashboardTareaInvestigacion.setValueTotal(contTotaltareas.intValue());
-    //             dashboardTareaInvestigacion.setTarea(tarea);
-    //             dashboardTareaInvestigacion.setSeries(series);
-    //             dashboardTareaInvestigacionList.add(dashboardTareaInvestigacion);
-    //         }
-    //         dashboardProyectoInvestigacion.setName(proyecto.getNombreProyecto());
-    //         dashboardProyectoInvestigacion.setValue((contProyecto / contadorTotalProyecto) * 100);
-    //         dashboardProyectoInvestigacion.setValueTotal(contadorTotalProyecto.intValue());
-    //         dashboardProyectoInvestigacion.setDasboardTareaInvestigacionList(dashboardTareaInvestigacionList);
-    //         listDataDashboard.add(dashboardProyectoInvestigacion);
-    //     }
-    //     return listDataDashboard;
-    // }
+                dashboardTareaInvestigacion.setName(contTareasPorProyecto + "." + tarea.getNombreTarea());
+                dashboardTareaInvestigacion.setValue((contTareas / contTotaltareas) * 100);
+                dashboardTareaInvestigacion.setValueTotal(contTotaltareas.intValue());
+                dashboardTareaInvestigacion.setTarea(tarea);
+                dashboardTareaInvestigacion.setSeries(series);
+                dashboardTareaInvestigacionList.add(dashboardTareaInvestigacion);
+            }
+            dashboardProyectoInvestigacion.setName(proyecto.getNombreProyecto());
+            dashboardProyectoInvestigacion.setValue((contProyecto / contadorTotalProyecto) * 100);
+            dashboardProyectoInvestigacion.setValueTotal(contadorTotalProyecto.intValue());
+            dashboardProyectoInvestigacion.setDasboardTareaVinculacionList(dashboardTareaInvestigacionList);
+            listDataDashboard.add(dashboardProyectoInvestigacion);
+        }
+        return listDataDashboard;
+    }
 
     // public List<Docente> listarDocentesTareasAsignadas() {
     //     List<Docente> docentes = this.docenteDao.findAll();

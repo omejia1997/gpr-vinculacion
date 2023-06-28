@@ -8,7 +8,7 @@ import ec.edu.espe.gpr.vinculacion.model.TareaVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareaIndicador;
 
 @Data
-public class DashboardTareaInvestigacion {
+public class DashboardTareaVinculacion {
     private String name;
     private Double value;
     private Integer valueTotal;

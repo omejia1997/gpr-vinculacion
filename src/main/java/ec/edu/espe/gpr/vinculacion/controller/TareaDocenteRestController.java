@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteVinculacion;
+import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareaIndicador;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareasRealizadas;
 import ec.edu.espe.gpr.vinculacion.services.TareaDocenteVinculacionService;
@@ -86,15 +87,15 @@ public class TareaDocenteRestController {
     //     }
     // }
 
-    // @GetMapping(path = "/obtenerDatosProyectoDashboardInvestigacion/{idTipoProceso}")
-    // public ResponseEntity<List<DashboardProyectoInvestigacion>> obtenerDatosProyectoDashboardInvestigacion(@PathVariable Integer idTipoProceso) {
-    //     try {
-    //         List<DashboardProyectoInvestigacion> docentes = this.tareaDocenteService.obtenerDatosProyectoDashboardInvestigacion(idTipoProceso);
-    //         return ResponseEntity.ok(docentes);
-    //     } catch (Exception e) {
-    //         return ResponseEntity.badRequest().build();
-    //     }
-    // }
+    @GetMapping(path = "/obtenerDatosProyectoDashboardVinculacion")
+    public ResponseEntity<List<DashboardProyectoVinculacion>> obtenerDatosProyectoDashboardInvestigacion() {
+        try {
+            List<DashboardProyectoVinculacion> docentes = this.tareaDocenteService.obtenerDatosProyectoDashboardVinculacion();
+            return ResponseEntity.ok(docentes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     // @GetMapping(path = "/listarDocentesTareasAsignadas")
     // public ResponseEntity<List<Docente>> listarDocentesTareasAsignadas() {
