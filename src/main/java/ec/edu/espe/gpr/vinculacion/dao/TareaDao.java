@@ -10,4 +10,5 @@ public interface TareaDao extends MongoRepository<TareaVinculacion, String> {
     List<TareaVinculacion> findByIdDocenteRevisor(String idDocenteRevisor);
     List<TareaVinculacion> findByIdDocenteRevisorAndProyecto(String idDocenteRevisor,ProyectoVinculacion proyecto);
     List<TareaVinculacion> findByProyecto(ProyectoVinculacion proyecto);
+    List<TareaVinculacion> findByProyectoId(String idProyecto);
 }

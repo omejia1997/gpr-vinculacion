@@ -1,7 +1,10 @@
 package ec.edu.espe.gpr.vinculacion.controller;
 
+import java.io.File;
 import java.util.List;
 
+import ec.edu.espe.gpr.vinculacion.model.TareaVinculacion;
+import ec.edu.espe.gpr.vinculacion.model.file.FileModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,6 +50,28 @@ public class TareaDocenteRestController {
         }
     }
 
+    @GetMapping(path = "/obtenerArchivoTarea/{idTarea}")
+    public ResponseEntity<FileModel> obtenerUrlArchivo(@PathVariable String idTarea) {
+        try {
+
+            FileModel fileModel = this.tareaDocenteService.obtenerUrlArchivo(idTarea);
+            return ResponseEntity.ok(fileModel);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(path = "/obtenerArchivoTareaDocente/{codigoTareaDocente}")
+    public ResponseEntity<FileModel> obtenerArchivoTareaDocente(@PathVariable String codigoTareaDocente) {
+        try {
+
+            FileModel fileModel = this.tareaDocenteService.obtenerArchivoTareaDocente(codigoTareaDocente);
+            return ResponseEntity.ok(fileModel);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     // @GetMapping(path = "/listarTareas/{idDocente}")
     // public ResponseEntity<List<TareaDocenteProyecto>> listarTareas(@PathVariable String idDocente) {
     //     try {
@@ -76,6 +101,7 @@ public class TareaDocenteRestController {
             return ResponseEntity.badRequest().build();
         }
     }
+
 
     // @GetMapping(path = "/listarDocentes")
     // public ResponseEntity<List<Docente>> listarDocentes() {
@@ -232,13 +258,13 @@ public class TareaDocenteRestController {
     }
 
     @PostMapping(path = "/crearTareaConArchivo")
-    public ResponseEntity<String> crear(@RequestParam("tareaDocenteProyecto") String strTareaDocenteProyecto,
+    public ResponseEntity<TareaVinculacion> crear(@RequestParam("tareaDocenteProyecto") String strTareaDocenteProyecto,
             @RequestParam("file") MultipartFile file ) {
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
             TareaDocenteProyectoVinculacion tareaDocenteProyecto = gson.fromJson(strTareaDocenteProyecto, TareaDocenteProyectoVinculacion.class);
-            this.tareaDocenteService.crear(tareaDocenteProyecto,file);
-            return ResponseEntity.ok().build();
+            TareaVinculacion tareaVinculacion =this.tareaDocenteService.crear(tareaDocenteProyecto,file);
+            return ResponseEntity.ok(tareaVinculacion);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
@@ -258,13 +284,13 @@ public class TareaDocenteRestController {
     }
 
     @PostMapping(path = "/crearTareaConArchivoProgramada")
-    public ResponseEntity<String> crearTareaConArchivoProgramada(@RequestParam("tareaDocenteProyecto") String strTareaDocenteProyecto,
+    public ResponseEntity<List<TareaVinculacion>> crearTareaConArchivoProgramada(@RequestParam("tareaDocenteProyecto") String strTareaDocenteProyecto,
             @RequestParam("file") MultipartFile file ) {
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
             TareaDocenteProyectoVinculacion tareaDocenteProyecto = gson.fromJson(strTareaDocenteProyecto, TareaDocenteProyectoVinculacion.class);
-            this.tareaDocenteService.crearTareaProgramada(tareaDocenteProyecto,file);
-            return ResponseEntity.ok().build();
+            List<TareaVinculacion> tareaVinculacions = this.tareaDocenteService.crearTareaProgramada(tareaDocenteProyecto,file);
+            return ResponseEntity.ok(tareaVinculacions);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
@@ -323,14 +349,14 @@ public class TareaDocenteRestController {
     }
 
     @PutMapping("/guardarArchivoTareaAsignadaAlProfesor")
-    public ResponseEntity<String> guardarArchivoTareaAsignadaAlProfesor(@RequestParam("file") MultipartFile file,
-            @RequestParam("tareaIndicadors") String strTareaIndicadors, @RequestParam("codigoTareaDocente") String id) {
+    public ResponseEntity<TareaDocenteVinculacion> guardarArchivoTareaAsignadaAlProfesor(@RequestParam("file") MultipartFile file,
+            @RequestParam("tareaIndicadors") String strTareaIndicadors, @RequestParam("idTareaDocente") String id) {
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
             //List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, TareaIndicador[].class);
             List<TareaIndicador> tareaIndicadors = gson.fromJson(strTareaIndicadors, new TypeToken<List<TareaIndicador>>(){}.getType());
-            this.tareaDocenteService.guardarTareaAsignadaAlProfesor(tareaIndicadors,file,id);
-            return ResponseEntity.ok().build();
+            TareaDocenteVinculacion tareaDocenteVinculacion = this.tareaDocenteService.guardarTareaAsignadaAlProfesor(tareaIndicadors,file,id);
+            return ResponseEntity.ok(tareaDocenteVinculacion);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

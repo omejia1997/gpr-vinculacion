@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -67,6 +68,38 @@ public class TareaDocenteVinculacionService {
             return tareaOpt.get();
         else
             return null;
+    }
+
+    public FileModel obtenerUrlArchivo(String idTarea){
+        TareaVinculacion tarea = this.obtenerTareaPorCodigoTarea(idTarea);
+        FileModel fileModel=null;
+        if (tarea.getNombreArchivoTarea() != ""
+                || tarea.getNombreArchivoTarea() != null) {
+            ResponseEntity<FileModel> response = this.restTemplate.getForEntity(
+                    baseURLs.getGprStorageURL() + "/getFileTarea/"
+                            + ModulosEnum.VINCULACION.getValue()+ "/"
+                            + tarea.getNombreArchivoTarea() + "/"
+                            + tarea.getNombreArchivoTareaEnStorage(),
+                    FileModel.class);
+            fileModel = response.getBody();
+        }
+        return fileModel;
+    }
+
+    public FileModel obtenerArchivoTareaDocente(String idTareaDocente){
+        TareaDocenteVinculacion tareaDocente = this.tareaDocenteDao.findById(idTareaDocente).get();
+        FileModel fileModel=null;
+        if (tareaDocente.getNombreArchivoTareaDocente() != ""
+                || tareaDocente.getNombreArchivoTareaDocente() != null) {
+            ResponseEntity<FileModel> response = this.restTemplate.getForEntity(
+                    baseURLs.getGprStorageURL() + "/getFileDocenteTarea/"
+                            + ModulosEnum.VINCULACION.getValue()+ "/"
+                            + tareaDocente.getNombreArchivoTareaDocente() + "/"
+                            + tareaDocente.getNombreArchivoTareaDocenteEnStorage(),
+                    FileModel.class);
+            fileModel = response.getBody();
+        }
+        return fileModel;
     }
 
     // public Cargo obtenerCargoPorCodigoCargo(String codigoCargo) {
@@ -126,7 +159,8 @@ public class TareaDocenteVinculacionService {
     public List<TareaDocenteProyectoVinculacion> listarTodasTareasPorProyecto(String idProyecto) {
         List<TareaDocenteProyectoVinculacion> tListDocenteProyecto = new ArrayList<>();
         ProyectoVinculacion proyecto = this.proyectoDao.findById(idProyecto).get();//codigo de proyecto
-        List<TareaVinculacion> tarea = this.tareaDao.findByProyecto(proyecto);
+        //List<TareaVinculacion> tareaTodas = this.tareaDao.findAll();
+        List<TareaVinculacion> tarea = this.tareaDao.findByProyectoId(proyecto.getId());
         for (TareaVinculacion t : tarea) {
             TareaDocenteProyectoVinculacion tDocenteProyecto = new TareaDocenteProyectoVinculacion();
             tDocenteProyecto.setTarea(t);
@@ -190,7 +224,7 @@ public class TareaDocenteVinculacionService {
             dashboardProyectoInvestigacion.setProyecto(proyecto);
             dashboardTareaInvestigacionList = new ArrayList<>();
             Integer contTareasPorProyecto = 0;
-            for (TareaVinculacion tarea : this.tareaDao.findByProyecto(proyecto)) {
+            for (TareaVinculacion tarea : this.tareaDao.findByProyectoId(proyecto.getId())) {
 
                 contTotaltareas = 0.0;
                 contTareas = 0.0;
@@ -201,13 +235,15 @@ public class TareaDocenteVinculacionService {
                 Integer contTareaDenegado = 0;
 
                 DashboardTareaVinculacion dashboardTareaInvestigacion = new DashboardTareaVinculacion();
-                Boolean check = true;
+                //Boolean check = true;
 
+                List<TareaDocenteVinculacion> tareaDocenteVinculacionList = new ArrayList<>();
                 for (TareaDocenteVinculacion tareaDocente : this.tareaDocenteDao.findByTareaId(tarea.getId())) {
-                    if (check) {
-                        dashboardTareaInvestigacion.setTareaIndicadorList(tareaDocente.getTareaIndicadorList());
-                        check = false;
-                    }
+                    //if (check) {
+                    //tareaDocente.getTareaIndicadorList()
+                      //  check = false;
+                    //}
+
                     if (tareaDocente.getEstadoTareaDocente().equals("ACEPTADO")) {
                         contProyecto++;
                         contTareas++;
@@ -221,8 +257,9 @@ public class TareaDocenteVinculacionService {
 
                     contadorTotalProyecto++;
                     contTotaltareas++;
-
+                    tareaDocenteVinculacionList.add(tareaDocente);
                 }
+                dashboardTareaInvestigacion.setTareaDocenteVinculacionList(tareaDocenteVinculacionList);
                 List<Series> series = new ArrayList<>();
 
                 Series seriesModel = new Series();
@@ -351,6 +388,7 @@ public class TareaDocenteVinculacionService {
                 tRealizada.setNombreArchivo(tareaDocente.getNombreArchivoTareaDocente());
                 ResponseEntity<FileModel> response = this.restTemplate.getForEntity(
                         baseURLs.getGprStorageURL() + "/getFileDocenteTarea/"
+                                + ModulosEnum.VINCULACION.getValue()+ "/"
                                 + tareaDocente.getNombreArchivoTareaDocente() + "/"
                                 + tareaDocente.getNombreArchivoTareaDocenteEnStorage(),
                         FileModel.class);
@@ -363,7 +401,7 @@ public class TareaDocenteVinculacionService {
         return tRealizadas;
     }
 
-    public void crear(TareaDocenteProyectoVinculacion tareaDocenteProyecto, MultipartFile file) {
+    public TareaVinculacion crear(TareaDocenteProyectoVinculacion tareaDocenteProyecto, MultipartFile file) {
         tareaDocenteProyecto.getTarea().setFechaCreaciontarea(new Date());
         tareaDocenteProyecto.getTarea().setEstadoTarea(EstadoTareaEnum.ACTIVE.getValue().charAt(0));
         TareaVinculacion tarea = this.tareaDao.save(tareaDocenteProyecto.getTarea());
@@ -378,13 +416,17 @@ public class TareaDocenteVinculacionService {
             tarea.setNombreArchivoTareaEnStorage(tarea.getId() + "." + extensionArchivo);
             tarea.setNombreArchivoTarea(file.getOriginalFilename());
             tarea = this.tareaDao.save(tarea);
-            FileRequest fileRequest = new FileRequest(file, tarea.getNombreArchivoTareaEnStorage());
-            this.restTemplate.postForObject(
+            /*try {
+             FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tarea.getNombreArchivoTareaEnStorage());
+             this.restTemplate.postForObject(
                     baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(), fileRequest,
                     FileRequest.class);
-            // this.saveFileGuia(file,);
+            // this.saveFileGuia(file,);   
+            } catch (Exception e) {
+                System.out.println("Se cayo:"+e.getMessage());
+            }*/
         }
-
+        Integer codigoTareaIndicador=0;
         for (Docente docente : tareaDocenteProyecto.getDocentes()) {
             TareaDocenteVinculacion t = new TareaDocenteVinculacion();
             t.setEstadoTareaDocente(EstadoTareaDocenteEnum.ASIGNADA.getValue());
@@ -393,7 +435,9 @@ public class TareaDocenteVinculacionService {
             t.setCedulaDocenteRevisor(tarea.getIdDocenteRevisor());
             List<TareaIndicador> tareaIndicadors = new ArrayList<>();
             for (Indicador indicador : tareaDocenteProyecto.getIndicadors()) {
+                codigoTareaIndicador++;
                 TareaIndicador indicadorBD = new TareaIndicador();
+                indicadorBD.setCodigoTareaIndicador(codigoTareaIndicador);
                 indicadorBD.setFechaCreacionIndicador(new Date());
                 indicadorBD.setIndicadorCODIGOINDICADOR(indicador);
                 indicadorBD.setDescripcionTareaIndicador(indicador.getDescripcionIndicador());
@@ -409,13 +453,15 @@ public class TareaDocenteVinculacionService {
             //         "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
             //                 ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
         }
+        return tarea;
     }
 
-    public void crearTareaProgramada(TareaDocenteProyectoVinculacion tareaDocenteProyecto, MultipartFile file) {
+    public List<TareaVinculacion> crearTareaProgramada(TareaDocenteProyectoVinculacion tareaDocenteProyecto, MultipartFile file) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         DateTimeFormatter formateador = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         tareaDocenteProyecto.getTarea().setFechaCreaciontarea(new Date());
         tareaDocenteProyecto.getTarea().setEstadoTarea(EstadoTareaEnum.ACTIVE.getValue().charAt(0));
+        List<TareaVinculacion> tareaVinculacions = new ArrayList<>();
         for (int k = 0; k < tareaDocenteProyecto.getTarea().getCantidadRepeticiones(); k++) {
             TareaVinculacion tareaNueva = new TareaVinculacion();
             tareaNueva.setNombreTarea(tareaDocenteProyecto.getTarea().getNombreTarea());
@@ -464,7 +510,6 @@ public class TareaDocenteVinculacionService {
             }
 
             TareaVinculacion tarea = this.tareaDao.save(tareaNueva);
-
             if (file != null) {
                 String extensionArchivo = "";
                 int i = file.getOriginalFilename().toString().lastIndexOf('.');
@@ -475,12 +520,16 @@ public class TareaDocenteVinculacionService {
                 tarea.setNombreArchivoTareaEnStorage(tarea.getId() + "." + extensionArchivo);
                 tarea.setNombreArchivoTarea(file.getOriginalFilename());
                 tarea = this.tareaDao.save(tarea);
-
-                FileRequest fileRequest = new FileRequest(file, tarea.getNombreArchivoTareaEnStorage());
+                /*try {
+                FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tarea.getNombreArchivoTareaEnStorage());
                 this.restTemplate.postForObject(
                         baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(),
-                        fileRequest, FileRequest.class);
+                        fileRequest, FileRequest.class);    
+                } catch (Exception e) {
+                    System.out.println("Se cayo:"+e.getMessage());
+                }*/
             }
+            tareaVinculacions.add(tarea);
             Integer codigoTareaIndicador=0;
             for (Docente docente : tareaDocenteProyecto.getDocentes()) {
                 TareaDocenteVinculacion t = new TareaDocenteVinculacion();
@@ -512,6 +561,7 @@ public class TareaDocenteVinculacionService {
             tareaNueva.setFechaInicioTarea(tareaNueva.getFechaFinTarea());
             tareaDocenteProyecto.getTarea().setFechaInicioTarea(tareaNueva.getFechaFinTarea());
         }
+        return tareaVinculacions;
     }
 
     public TareaDocenteVinculacion modificarDatos(TareaDocenteProyectoVinculacion tareaDocenteProyecto, MultipartFile file) {
@@ -526,10 +576,14 @@ public class TareaDocenteVinculacionService {
             tarea.setNombreArchivoTareaEnStorage(tarea.getId().toString() + "." + extensionArchivo);
             tarea.setNombreArchivoTarea(file.getOriginalFilename());
             tarea = this.tareaDao.save(tarea);
-            FileRequest fileRequest = new FileRequest(file, tarea.getNombreArchivoTareaEnStorage());
-            this.restTemplate.postForObject(
-                    baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(), fileRequest,
-                    FileRequest.class);
+            /*try {
+                FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tarea.getNombreArchivoTareaEnStorage());    
+                this.restTemplate.postForObject(
+                baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(), fileRequest,
+                FileRequest.class);
+            } catch (Exception e) {
+            }*/
+
         }
 
         int indice;
@@ -581,17 +635,20 @@ public class TareaDocenteVinculacionService {
         return new TareaDocenteVinculacion();
     }
 
-    public void guardarTareaAsignadaAlProfesor(List<TareaIndicador> tareaIndicadors, MultipartFile file,
+    public TareaDocenteVinculacion guardarTareaAsignadaAlProfesor(List<TareaIndicador> tareaIndicadors, MultipartFile file,
             String id) {
         TareaDocenteVinculacion tareaDocente = this.tareaDocenteDao.findById(id).get();
         if (file != null) {
             tareaDocente.setNombreArchivoTareaDocenteEnStorage(tareaDocente.getId() + ".pdf");// Revisar
             tareaDocente.setNombreArchivoTareaDocente(file.getOriginalFilename());
 
-            FileRequest fileRequest = new FileRequest(file, tareaDocente.getNombreArchivoTareaDocenteEnStorage());
+            /*try {
+            FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tareaDocente.getNombreArchivoTareaDocenteEnStorage());
             this.restTemplate.postForObject(
                     baseURLs.getGprStorageURL() + "/saveFile/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
-                    FileRequest.class);
+                    FileRequest.class);    
+            } catch (Exception e) {
+            }*/
         }
         tareaDocente.setTareaIndicadorList(tareaIndicadors);
         // for (TareaIndicador tIndicador : tareaIndicadors)
@@ -610,6 +667,7 @@ public class TareaDocenteVinculacionService {
                 "La Actividad perteneciente a: " + tareaDocente.getCodigoDocente().getNombreDocente() + " " +
                         tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
         */
+        return tareaDocente;
     }
 
 

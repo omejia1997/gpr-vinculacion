@@ -1,5 +1,6 @@
 package ec.edu.espe.gpr.vinculacion.model.dashboard;
 
+import ec.edu.espe.gpr.vinculacion.model.TareaDocenteVinculacion;
 import lombok.Data;
 
 import java.util.List;
@@ -14,6 +15,6 @@ public class DashboardTareaVinculacion {
     private Integer valueTotal;
     private TareaVinculacion tarea;
     private List<Series> series;
-    private List<TareaIndicador> tareaIndicadorList;
-
+    private List<TareaDocenteVinculacion> tareaDocenteVinculacionList;
+//    private List<TareaIndicador> tareaIndicadorList;
 }
