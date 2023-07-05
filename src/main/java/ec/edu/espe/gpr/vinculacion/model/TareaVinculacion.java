@@ -24,11 +24,7 @@ public class TareaVinculacion {
     
     private String nombreTarea;
 
-    //private String tipoTarea;
-
     private Date fechaCreaciontarea;
-
-    //private String prioridadTarea;
 
     private String observacionTarea;
 
@@ -39,10 +35,6 @@ public class TareaVinculacion {
     private String nombreArchivoTareaEnStorage;
 
     private String nombreArchivoTarea;
-
-    //private String pesoTarea;
-
-    //private int valorPesoTarea;
 
     private String idDocenteRevisor;
 
@@ -59,7 +51,5 @@ public class TareaVinculacion {
     private String tipoActividad;
 
     private ProyectoVinculacion proyecto;
-
-    //private List<TareaDocente> tareaDocenteList;
 
 }

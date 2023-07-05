@@ -5,19 +5,15 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import ec.edu.espe.gpr.vinculacion.config.BaseURLValues;
 import ec.edu.espe.gpr.vinculacion.dao.ProyectoDao;
@@ -34,12 +30,10 @@ import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardTareaVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.dashboard.Series;
 import ec.edu.espe.gpr.vinculacion.model.file.FileModel;
-import ec.edu.espe.gpr.vinculacion.model.file.FileRequest;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.Docente;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.Indicador;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareaIndicador;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareasRealizadas;
-import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TipoProceso;
 
 @Service
 public class TareaDocenteVinculacionService {
@@ -59,8 +53,8 @@ public class TareaDocenteVinculacionService {
     @Autowired
     private BaseURLValues baseURLs;
 
-    // @Autowired
-    // private IEmailService emservice;
+    @Autowired
+    private EmailService emservice;
 
     public TareaVinculacion obtenerTareaPorCodigoTarea(String codTarea) {
         Optional<TareaVinculacion> tareaOpt = this.tareaDao.findById(codTarea);
@@ -101,54 +95,6 @@ public class TareaDocenteVinculacionService {
         }
         return fileModel;
     }
-
-    // public Cargo obtenerCargoPorCodigoCargo(String codigoCargo) {
-    //     Optional<Cargo> cargoOpt = this.cargoDao.findById(codigoCargo);
-    //     if (cargoOpt.isPresent())
-    //         return cargoOpt.get();
-    //     else
-    //         return null;
-    // }
-
-    /*
-     * private Docente obtenerDocentePorCodigoUsuario(Usuario usuario) {
-     * Optional<Docente> docenteOpt = this.docenteDao.findByCodigoUsuario(usuario);
-     * if (docenteOpt.isPresent())
-     * return docenteOpt.get();
-     * else
-     * return null;
-     * }
-     * 
-     * private List<Docente> obtenerDocentesPorPerfil(Perfil perfil){
-     * List<Usuper> usupers= this.usuarioperfilDao.findByCodigoPerfil(perfil);
-     * List<Docente> docentes = new ArrayList<>();
-     * for (Usuper usuper : usupers) {
-     * Docente docente =
-     * this.obtenerDocentePorCodigoUsuario(usuper.getCodigoUsuario());
-     * docentes.add(docente);
-     * }
-     * return docentes;
-     * }
-     * 
-     * private Perfil obtenerPerfilPorCodigoPerfil(String codPerfil) {
-     * Optional<Perfil> perfilOpt = this.perfilDao.findById(codPerfil);
-     * if (perfilOpt.isPresent())
-     * return perfilOpt.get();
-     * else
-     * return null;
-     * }
-     * 
-     */
-    /*
-     * private Perfil obtenerPerfilPorCodigoPerfilPadre(Perfil codPerfil) {
-     * Optional<Perfil> perfilOpt =
-     * this.perfilDao.findByCodigoPerfilPadre(codPerfil);
-     * if (perfilOpt.isPresent())
-     * return perfilOpt.get();
-     * else
-     * return null;
-     * }
-     */
 
     public List<TareaDocenteVinculacion> listarTareasDocentePorCodigoTarea(String idTarea) {
        return this.tareaDocenteDao.findByTareaId(idTarea);
@@ -449,9 +395,9 @@ public class TareaDocenteVinculacionService {
             //TareaDocenteVinculacion tDocenteBD = this.tareaDocenteDao.save(t);
             this.tareaDocenteDao.save(t);
 
-            // emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
-            //         "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
-            //                 ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
+            emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
+            "Se ha asignado una nueva "+
+                             ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
         }
         return tarea;
     }
@@ -553,10 +499,10 @@ public class TareaDocenteVinculacionService {
                 // TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
                 t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
-                // emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " +
-                // tarea.getNombreTarea(),
-                // "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
-                // ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
+                emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " +
+                tarea.getNombreTarea(),
+                "Se ha asignado una nueva tarea " +
+                        ",y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
             }
             tareaNueva.setFechaInicioTarea(tareaNueva.getFechaFinTarea());
             tareaDocenteProyecto.getTarea().setFechaInicioTarea(tareaNueva.getFechaFinTarea());
@@ -623,12 +569,11 @@ public class TareaDocenteVinculacionService {
                 t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
 
-                // emservice.enviarCorreo(docente.getCorreoDocente(),
-                //         "GPR - Nueva Tarea: " + tareaDocenteProyecto.getTarea().getNombreTarea(),
-                //         "Se ha asignado una nueva tarea de prioridad "
-                //                 + tareaDocenteProyecto.getTarea().getPrioridadTarea() +
-                //                 ", y debe ser realizada hasta la fecha de:"
-                //                 + tareaDocenteProyecto.getTarea().getFechaEntregaTarea());
+                emservice.enviarCorreo(docente.getCorreoDocente(),
+                "GPR - Nueva Tarea: " + tareaDocenteProyecto.getTarea().getNombreTarea(),
+                "Se ha asignado una nueva tarea  " +
+                        ", y debe ser realizada hasta la fecha de:"
+                                 + tareaDocenteProyecto.getTarea().getFechaEntregaTarea());
                 
             }
         }
@@ -659,31 +604,32 @@ public class TareaDocenteVinculacionService {
         // Tarea tarea = tareaDocente.getCodigoTarea();
         // tarea.setEstadoTarea(EstadoTareaEnum.INACTIVE.getValue().charAt(0));
         // this.tareaDao.save(tarea);
-
-        /*//Comprobar para mail
-        Docente docenteRevisor = this.docenteDao.findByCedulaDocente(tarea.getIdDocenteRevisor());
+        ResponseEntity<Docente> response = this.restTemplate.getForEntity(
+                baseURLs.getGprMicroserviceInvestigationURL() + "/obtenerDocentePorCedula/"
+                        + tareaDocente.getCedulaDocenteRevisor(),
+                Docente.class);
+        Docente docenteRevisor = response.getBody();
         emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
-                "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-                "La Actividad perteneciente a: " + tareaDocente.getCodigoDocente().getNombreDocente() + " " +
-                        tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
-        */
+                "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
+                "La Actividad perteneciente a: " + tareaDocente.getDocente().getNombreDocente() + " " +
+                        tareaDocente.getDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
         return tareaDocente;
     }
 
 
     public void aprobarTareaDocente(TareaDocenteVinculacion tareaDocente) {
         tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getValue());
-        // emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
-        //         "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-        //         "Su Actividad ha sido aprobada: ");
+        emservice.enviarCorreo(tareaDocente.getDocente().getCorreoDocente(),
+        "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
+        "Su Actividad ha sido aprobada: ");
         this.tareaDocenteDao.save(tareaDocente);
     }
 
     public void denegarTareaDocente(TareaDocenteVinculacion tareaDocente) {
         tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.DENEGADO.getValue());
-        // emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
-        //         "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-        //         "Su Actividad ha sido Denegada: ");
+        emservice.enviarCorreo(tareaDocente.getDocente().getCorreoDocente(),
+        "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
+        "Su Actividad ha sido Denegada: ");
         this.tareaDocenteDao.save(tareaDocente);
     }
 

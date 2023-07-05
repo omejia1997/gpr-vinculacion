@@ -1,10 +1,7 @@
 package ec.edu.espe.gpr.vinculacion.controller;
 
-import java.io.File;
 import java.util.List;
 
-import ec.edu.espe.gpr.vinculacion.model.TareaVinculacion;
-import ec.edu.espe.gpr.vinculacion.model.file.FileModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,7 +22,9 @@ import com.google.gson.reflect.TypeToken;
 
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteProyectoVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.TareaDocenteVinculacion;
+import ec.edu.espe.gpr.vinculacion.model.TareaVinculacion;
 import ec.edu.espe.gpr.vinculacion.model.dashboard.DashboardProyectoVinculacion;
+import ec.edu.espe.gpr.vinculacion.model.file.FileModel;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareaIndicador;
 import ec.edu.espe.gpr.vinculacion.model.microservicegpr.TareasRealizadas;
 import ec.edu.espe.gpr.vinculacion.services.TareaDocenteVinculacionService;

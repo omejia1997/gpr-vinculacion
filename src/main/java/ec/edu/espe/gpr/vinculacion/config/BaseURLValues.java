@@ -9,7 +9,11 @@ import org.springframework.stereotype.Component;
 public class BaseURLValues {
     private final String gprStorageURL;
 
-    public BaseURLValues(@Value("${gpr.storage.base-url}") String gprStorageURL) {
+    private final String gprMicroserviceInvestigationURL;
+
+    public BaseURLValues(@Value("${gpr.storage.base-url}") String gprStorageURL,
+                         @Value("${gpr.microservice.investigation.base-url}") String gprMicroserviceInvestigationURL) {
         this.gprStorageURL = gprStorageURL;
+        this.gprMicroserviceInvestigationURL = gprMicroserviceInvestigationURL;
     }
 }

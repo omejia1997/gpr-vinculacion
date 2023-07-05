@@ -1,6 +1,5 @@
 package ec.edu.espe.gpr.vinculacion.model;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
@@ -24,6 +23,8 @@ public class ProyectoVinculacion{
     private String id;
     
     private String nombreProyecto;
+
+    private String nombreDirectorProyecto;
     
     private Date fechaCreacionproyecto;
     
