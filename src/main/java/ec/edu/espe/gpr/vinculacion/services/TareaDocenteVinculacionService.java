@@ -395,11 +395,10 @@ public class TareaDocenteVinculacionService {
             //TareaDocenteVinculacion tDocenteBD = this.tareaDocenteDao.save(t);
             this.tareaDocenteDao.save(t);
 
-            /*emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
+            emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
             "Se ha asignado una nueva "+
                              ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
 
-             */
         }
         return tarea;
     }
@@ -501,12 +500,12 @@ public class TareaDocenteVinculacionService {
                 // TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
                 t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
-                /*emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " +
+                emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " +
                 tarea.getNombreTarea(),
                 "Se ha asignado una nueva tarea " +
                         ",y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
 
-                 */
+
             }
             tareaNueva.setFechaInicioTarea(tareaNueva.getFechaFinTarea());
             tareaDocenteProyecto.getTarea().setFechaInicioTarea(tareaNueva.getFechaFinTarea());
@@ -573,13 +572,13 @@ public class TareaDocenteVinculacionService {
                 t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
 
-                /*emservice.enviarCorreo(docente.getCorreoDocente(),
+                emservice.enviarCorreo(docente.getCorreoDocente(),
                 "GPR - Nueva Tarea: " + tareaDocenteProyecto.getTarea().getNombreTarea(),
                 "Se ha asignado una nueva tarea  " +
                         ", y debe ser realizada hasta la fecha de:"
                                  + tareaDocenteProyecto.getTarea().getFechaEntregaTarea());
 
-                 */
+
 
             }
         }
@@ -619,33 +618,33 @@ public class TareaDocenteVinculacionService {
         // tarea.setEstadoTarea(EstadoTareaEnum.INACTIVE.getValue().charAt(0));
         // this.tareaDao.save(tarea);
 
-        /*emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
+        emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
                 "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
                 "La Actividad perteneciente a: " + tareaDocente.getDocente().getNombreDocente() + " " +
                         tareaDocente.getDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
 
-         */
+
         return tareaDocente;
     }
 
 
     public void aprobarTareaDocente(TareaDocenteVinculacion tareaDocente) {
         tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getValue());
-        /*emservice.enviarCorreo(tareaDocente.getDocente().getCorreoDocente(),
+        emservice.enviarCorreo(tareaDocente.getDocente().getCorreoDocente(),
         "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
         "Su Actividad ha sido aprobada: ");
 
-         */
+
         this.tareaDocenteDao.save(tareaDocente);
     }
 
     public void denegarTareaDocente(TareaDocenteVinculacion tareaDocente) {
         tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.DENEGADO.getValue());
-        /*emservice.enviarCorreo(tareaDocente.getDocente().getCorreoDocente(),
+        emservice.enviarCorreo(tareaDocente.getDocente().getCorreoDocente(),
         "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
         "Su Actividad ha sido Denegada: ");
 
-         */
+
         this.tareaDocenteDao.save(tareaDocente);
     }
 
