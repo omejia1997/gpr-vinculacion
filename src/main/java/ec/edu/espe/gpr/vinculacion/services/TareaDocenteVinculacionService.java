@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import ec.edu.espe.gpr.vinculacion.model.file.FileRequest;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -362,15 +364,15 @@ public class TareaDocenteVinculacionService {
             tarea.setNombreArchivoTareaEnStorage(tarea.getId() + "." + extensionArchivo);
             tarea.setNombreArchivoTarea(file.getOriginalFilename());
             tarea = this.tareaDao.save(tarea);
-            /*try {
-             FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tarea.getNombreArchivoTareaEnStorage());
+            try {
+             FileRequest fileRequest = new FileRequest(convertBase64(file), tarea.getNombreArchivoTareaEnStorage());
              this.restTemplate.postForObject(
                     baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(), fileRequest,
                     FileRequest.class);
             // this.saveFileGuia(file,);   
             } catch (Exception e) {
                 System.out.println("Se cayo:"+e.getMessage());
-            }*/
+            }
         }
         Integer codigoTareaIndicador = 0;
         for (Docente docente : tareaDocenteProyecto.getDocentes()) {
@@ -467,14 +469,14 @@ public class TareaDocenteVinculacionService {
                 tarea.setNombreArchivoTareaEnStorage(tarea.getId() + "." + extensionArchivo);
                 tarea.setNombreArchivoTarea(file.getOriginalFilename());
                 tarea = this.tareaDao.save(tarea);
-                /*try {
-                FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tarea.getNombreArchivoTareaEnStorage());
+                try {
+                FileRequest fileRequest = new FileRequest(convertBase64(file), tarea.getNombreArchivoTareaEnStorage());
                 this.restTemplate.postForObject(
                         baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(),
                         fileRequest, FileRequest.class);    
                 } catch (Exception e) {
                     System.out.println("Se cayo:"+e.getMessage());
-                }*/
+                }
             }
             tareaVinculacions.add(tarea);
             Integer codigoTareaIndicador = 0;
@@ -500,12 +502,11 @@ public class TareaDocenteVinculacionService {
                 // TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
                 t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
+
                 emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " +
                 tarea.getNombreTarea(),
                 "Se ha asignado una nueva tarea " +
                         ",y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
-
-
             }
             tareaNueva.setFechaInicioTarea(tareaNueva.getFechaFinTarea());
             tareaDocenteProyecto.getTarea().setFechaInicioTarea(tareaNueva.getFechaFinTarea());
@@ -513,7 +514,19 @@ public class TareaDocenteVinculacionService {
         return tareaVinculacions;
     }
 
+    private String convertBase64(MultipartFile file) {
+        try {
+            byte[] fileBytes = file.getBytes();
+            byte[] encodedBytes = Base64.encodeBase64(fileBytes);
+            return new String(encodedBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public TareaDocenteVinculacion modificarDatos(TareaDocenteProyectoVinculacion tareaDocenteProyecto, MultipartFile file) {
+        String previousNameFile = null;
         TareaVinculacion tarea = this.tareaDao.save(tareaDocenteProyecto.getTarea());
         if (file != null) {
             String extensionArchivo = "";
@@ -521,18 +534,21 @@ public class TareaDocenteVinculacionService {
 
             if (i > 0)
                 extensionArchivo = file.getOriginalFilename().toString().substring(i + 1);
+            if(tarea.getNombreArchivoTareaEnStorage()!=null){
+                previousNameFile = tarea.getNombreArchivoTareaEnStorage();
+            }
 
             tarea.setNombreArchivoTareaEnStorage(tarea.getId().toString() + "." + extensionArchivo);
             tarea.setNombreArchivoTarea(file.getOriginalFilename());
             tarea = this.tareaDao.save(tarea);
-            /*try {
-                FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tarea.getNombreArchivoTareaEnStorage());    
+            try {
+                FileRequest fileRequest = new FileRequest(convertBase64(file), tarea.getNombreArchivoTareaEnStorage());
+                fileRequest.setPreviousNameFile(previousNameFile);
                 this.restTemplate.postForObject(
                 baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(), fileRequest,
                 FileRequest.class);
             } catch (Exception e) {
-            }*/
-
+            }
         }
 
         int indice;
@@ -577,9 +593,6 @@ public class TareaDocenteVinculacionService {
                 "Se ha asignado una nueva tarea  " +
                         ", y debe ser realizada hasta la fecha de:"
                                  + tareaDocenteProyecto.getTarea().getFechaEntregaTarea());
-
-
-
             }
         }
         return new TareaDocenteVinculacion();
@@ -589,7 +602,7 @@ public class TareaDocenteVinculacionService {
                                                                   String id) {
 
         TareaDocenteVinculacion tareaDocente = this.tareaDocenteDao.findById(id).get();
-
+        String previousNameFile = null;
         ResponseEntity<Docente> response = this.restTemplate.getForEntity(
                 baseURLs.getGprMicroserviceInvestigationURL() + "/api/v1/obtenerDocentePorCedula/"
                         + tareaDocente.getCedulaDocenteRevisor(),
@@ -597,16 +610,21 @@ public class TareaDocenteVinculacionService {
         Docente docenteRevisor = response.getBody();
 
         if (file != null) {
+            if(tareaDocente.getNombreArchivoTareaDocenteEnStorage()!=null){
+                previousNameFile = tareaDocente.getNombreArchivoTareaDocenteEnStorage();
+            }
+
             tareaDocente.setNombreArchivoTareaDocenteEnStorage(tareaDocente.getId() + ".pdf");// Revisar
             tareaDocente.setNombreArchivoTareaDocente(file.getOriginalFilename());
 
-            /*try {
-            FileRequest fileRequest = new FileRequest(new ByteArrayResource(file.getBytes()), tareaDocente.getNombreArchivoTareaDocenteEnStorage());
+            try {
+            FileRequest fileRequest = new FileRequest(convertBase64(file), tareaDocente.getNombreArchivoTareaDocenteEnStorage());
+            fileRequest.setPreviousNameFile(previousNameFile);
             this.restTemplate.postForObject(
-                    baseURLs.getGprStorageURL() + "/saveFile/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
+                    baseURLs.getGprStorageURL() + "/saveFile/" + ModulosEnum.VINCULACION.getValue(), fileRequest,
                     FileRequest.class);    
             } catch (Exception e) {
-            }*/
+            }
         }
         tareaDocente.setTareaIndicadorList(tareaIndicadors);
         // for (TareaIndicador tIndicador : tareaIndicadors)
@@ -622,8 +640,6 @@ public class TareaDocenteVinculacionService {
                 "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
                 "La Actividad perteneciente a: " + tareaDocente.getDocente().getNombreDocente() + " " +
                         tareaDocente.getDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
-
-
         return tareaDocente;
     }
 
@@ -643,8 +659,6 @@ public class TareaDocenteVinculacionService {
         emservice.enviarCorreo(tareaDocente.getDocente().getCorreoDocente(),
         "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
         "Su Actividad ha sido Denegada: ");
-
-
         this.tareaDocenteDao.save(tareaDocente);
     }
 

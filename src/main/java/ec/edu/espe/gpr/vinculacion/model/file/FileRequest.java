@@ -2,29 +2,41 @@ package ec.edu.espe.gpr.vinculacion.model.file;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.multipart.MultipartFile;
-
 public class FileRequest {
 
-    private ByteArrayResource file;
+    private String fileBase64;
     private String nameFile;
+    private String previousNameFile;
+
+    public FileRequest(String fileBase64, String nameFile) {
+        this.fileBase64 = fileBase64;
+        this.nameFile = nameFile;
+    }
 
     public FileRequest() {
     }
-    public FileRequest(ByteArrayResource file, String nameFile) {
-        this.file = file;
-        this.nameFile = nameFile;
+
+    public String getFileBase64() {
+        return fileBase64;
     }
-    public ByteArrayResource getFile() {
-        return file;
+
+    public void setFileBase64(String fileBase64) {
+        this.fileBase64 = fileBase64;
     }
-    public void setFile(ByteArrayResource file) {
-        this.file = file;
-    }
+
     public String getNameFile() {
         return nameFile;
     }
+
     public void setNameFile(String nameFile) {
         this.nameFile = nameFile;
     }
 
+    public String getPreviousNameFile() {
+        return previousNameFile;
+    }
+
+    public void setPreviousNameFile(String previousNameFile) {
+        this.previousNameFile = previousNameFile;
+    }
 }
