@@ -247,12 +247,12 @@ public class TareaDocenteVinculacionService {
     }
 
     public List<TareaDocenteVinculacion> listarTareaAsignadaPorDocente(Integer codigoDocente) {
-        List<TareaDocenteVinculacion> tareas = this.tareaDocenteDao.findByDocenteCodigoDocenteAndEstadoTareaDocente(codigoDocente,EstadoTareaDocenteEnum.ASIGNADA.getValue());
+        List<TareaDocenteVinculacion> tareas = this.tareaDocenteDao.findByDocenteCodigoDocenteAndEstadoTareaDocenteNot(codigoDocente,EstadoTareaDocenteEnum.ACEPTADO.getValue());
         return tareas;
     }
 
     public List<TareaDocenteVinculacion> listarTareasNoAsignadasPorDocente(Integer codigoDocente) {
-        List<TareaDocenteVinculacion> tareas = this.tareaDocenteDao.findByDocenteCodigoDocenteAndEstadoTareaDocenteNot(codigoDocente,EstadoTareaDocenteEnum.ASIGNADA.getValue());
+        List<TareaDocenteVinculacion> tareas = this.tareaDocenteDao.findByDocenteCodigoDocenteAndEstadoTareaDocente(codigoDocente,EstadoTareaDocenteEnum.ACEPTADO.getValue());
         return tareas;
     }
 
