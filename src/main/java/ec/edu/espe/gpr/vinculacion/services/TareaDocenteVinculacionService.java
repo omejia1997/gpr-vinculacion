@@ -100,14 +100,11 @@ public class TareaDocenteVinculacionService {
 
     public List<TareaDocenteVinculacion> listarTareasDocentePorCodigoTarea(String idTarea) {
         return this.tareaDocenteDao.findByTareaId(idTarea);
-        // return this.tareaDocenteDao.findByCodigoTarea(tarea);
-        // return tarea.getTareaDocenteList();
     }
 
     public List<TareaDocenteProyectoVinculacion> listarTodasTareasPorProyecto(String idProyecto) {
         List<TareaDocenteProyectoVinculacion> tListDocenteProyecto = new ArrayList<>();
         ProyectoVinculacion proyecto = this.proyectoDao.findById(idProyecto).get();//codigo de proyecto
-        //List<TareaVinculacion> tareaTodas = this.tareaDao.findAll();
         List<TareaVinculacion> tarea = this.tareaDao.findByProyectoId(proyecto.getId());
         for (TareaVinculacion t : tarea) {
             TareaDocenteProyectoVinculacion tDocenteProyecto = new TareaDocenteProyectoVinculacion();
@@ -183,15 +180,9 @@ public class TareaDocenteVinculacionService {
                 Integer contTareaDenegado = 0;
 
                 DashboardTareaVinculacion dashboardTareaInvestigacion = new DashboardTareaVinculacion();
-                //Boolean check = true;
 
                 List<TareaDocenteVinculacion> tareaDocenteVinculacionList = new ArrayList<>();
                 for (TareaDocenteVinculacion tareaDocente : this.tareaDocenteDao.findByTareaId(tarea.getId())) {
-                    //if (check) {
-                    //tareaDocente.getTareaIndicadorList()
-                    //  check = false;
-                    //}
-
                     if (tareaDocente.getEstadoTareaDocente().equals("ACEPTADO")) {
                         contProyecto++;
                         contTareas++;
@@ -250,65 +241,20 @@ public class TareaDocenteVinculacionService {
         return listDataDashboard;
     }
 
-    // public List<Docente> listarDocentesTareasAsignadas() {
-    //     List<Docente> docentes = this.docenteDao.findAll();
-    //     List<Docente> docentesAsignados = new ArrayList<>();
-
-    //     for (Docente docente : docentes) {
-    //         for (TareaDocente tareaDocente : docente.getTareaDocenteList()) {
-    //             if (!tareaDocente.getEstadoTareaDocente().equals(EstadoTareaDocenteEnum.ACEPTADO.getValue())) {
-    //                 docentesAsignados.add(docente);
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     return docentesAsignados;
-    // }
-
-
     public List<TareaDocenteVinculacion> listarTareasEntregadas(String cedulaDocenteRevisor) {
         return this.tareaDocenteDao.findByEstadoTareaDocenteAndCedulaDocenteRevisor(
                 EstadoTareaDocenteEnum.EN_REVISION.getText(), cedulaDocenteRevisor);
     }
 
-    // public List<TareaDocente> listarTareasAceptadas() {
-    //     return this.tareaDocenteDao.findByEstadoTareaDocente(EstadoTareaDocenteEnum.ACEPTADO.getText());
-    // }
-
-    // public List<Docente> listarDocentesTareaAsignada(Tarea codigoTarea) {
-    //     List<TareaDocente> tareas = this.tareaDocenteDao.findByCodigoTarea(codigoTarea);
-    //     List<Docente> docentes = new ArrayList<>();
-    //     for (TareaDocente tarea : tareas) {
-    //         docentes.add(tarea.getCodigoDocente());
-    //     }
-    //     return docentes;
-    // }
-
     public List<TareaDocenteVinculacion> listarTareaAsignadaPorDocente(Integer codigoDocente) {
-        //Docente docente = this.obtenerDocentePorCodigoDocente(codigoDocente);
-        List<TareaDocenteVinculacion> tareas = this.tareaDocenteDao.findByDocenteCodigoDocente(codigoDocente);
+        List<TareaDocenteVinculacion> tareas = this.tareaDocenteDao.findByDocenteCodigoDocenteAndEstadoTareaDocente(codigoDocente,EstadoTareaDocenteEnum.ASIGNADA.getValue());
         return tareas;
     }
 
-    // public List<TareaIndicador> listarIndicadoresPorTarea(Integer codigoTareaDocente) {
-    //     TareaDocente tareaDocente = this.obtenerIndicadorPorCodigoTareaDocente(codigoTareaDocente);
-    //     return tareaDocente.getTareaIndicadorList();
-    // }
-
-    // public List<TareaDocente> listarDocentesTareasAsignadas(Integer codigoDocente) {
-    //     Docente docente = this.obtenerDocentePorCodigoDocente(codigoDocente);
-    //     return this.tareaDocenteDao.findByCodigoDocenteAndEstadoTareaDocenteNot(docente,
-    //             EstadoTareaDocenteEnum.ACEPTADO.getValue());
-    // }
-
-    // public List<CargoDocente> listarCargoDocentePorCodDocente(Integer codigoDocente) {
-    //     Docente docente = this.obtenerDocentePorCodigoDocente(codigoDocente);
-    //     return this.cargoDocenteDao.findByCodigoDocente(docente);
-    // }
-
-    // public List<TareaDocente> listarTodasTareasRevisar() {
-    //     return this.tareaDocenteDao.findByEstadoTareaDocente(EstadoTareaDocenteEnum.EN_REVISION.getValue());
-    // }
+    public List<TareaDocenteVinculacion> listarTareasNoAsignadasPorDocente(Integer codigoDocente) {
+        List<TareaDocenteVinculacion> tareas = this.tareaDocenteDao.findByDocenteCodigoDocenteAndEstadoTareaDocenteNot(codigoDocente,EstadoTareaDocenteEnum.ASIGNADA.getValue());
+        return tareas;
+    }
 
     public List<TareasRealizadas> listarTodasTareasRevisadas() {
         List<TareaDocenteVinculacion> tareaDocentes = this.tareaDocenteDao
@@ -317,18 +263,12 @@ public class TareaDocenteVinculacionService {
         for (TareaDocenteVinculacion tareaDocente : tareaDocentes) {
             TareasRealizadas tRealizada = new TareasRealizadas();
             tRealizada.setNombreDocenteRevisor(tareaDocente.getTarea().getNombreDocenteRevisor());
-            // tRealizada.setTipoProceso(
-            //         tareaDocente.getTarea().getProyecto().getTipoProceso().getNombreTipoProceso());
             tRealizada.setNombreProyecto(tareaDocente.getTarea().getProyecto().getNombreProyecto());
             tRealizada.setNombreTarea(tareaDocente.getTarea().getNombreTarea());
-            //tRealizada.setPrioridadTarea(tareaDocente.getTarea().getPrioridadTarea());
-            // tRealizada.setPesoTarea(tareaDocente.getTarea().getValorPesoTarea() + " "
-            //         + tareaDocente.getTarea().getPesoTarea());
             tRealizada.setFechaCreaciontarea(tareaDocente.getTarea().getFechaCreaciontarea());
             tRealizada.setFechaEntregaTarea(tareaDocente.getTarea().getFechaEntregaTarea());
             tRealizada.setResponsable(tareaDocente.getDocente().getNombreDocente() + " "
                     + tareaDocente.getDocente().getApellidoDocente());
-            // tRealizada.setTareaIndicadors(this.tareaIndicadorDao.findByTareadocenteCODIGOTAREADOCENTE(tareaDocente));
             tRealizada.setTareaIndicadors(tareaDocente.getTareaIndicadorList());
 
             if (tareaDocente.getNombreArchivoTareaDocente() != ""
@@ -369,7 +309,6 @@ public class TareaDocenteVinculacionService {
              this.restTemplate.postForObject(
                     baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.VINCULACION.getValue(), fileRequest,
                     FileRequest.class);
-            // this.saveFileGuia(file,);   
             } catch (Exception e) {
                 System.out.println("Se cayo:"+e.getMessage());
             }
@@ -390,11 +329,8 @@ public class TareaDocenteVinculacionService {
                 indicadorBD.setIndicadorCODIGOINDICADOR(indicador);
                 indicadorBD.setDescripcionTareaIndicador(indicador.getDescripcionIndicador());
                 tareaIndicadors.add(indicadorBD);
-                //indicadorBD.setTareadocenteCODIGOTAREADOCENTE(tDocenteBD);
-                //this.tareaIndicadorDao.save(indicadorBD);
             }
             t.setTareaIndicadorList(tareaIndicadors);
-            //TareaDocenteVinculacion tDocenteBD = this.tareaDocenteDao.save(t);
             this.tareaDocenteDao.save(t);
 
             emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
@@ -414,15 +350,11 @@ public class TareaDocenteVinculacionService {
         for (int k = 0; k < tareaDocenteProyecto.getTarea().getCantidadRepeticiones(); k++) {
             TareaVinculacion tareaNueva = new TareaVinculacion();
             tareaNueva.setNombreTarea(tareaDocenteProyecto.getTarea().getNombreTarea());
-            //tareaNueva.setTipoTarea(tareaDocenteProyecto.getTarea().getTipoTarea());
             tareaNueva.setFechaCreaciontarea(tareaDocenteProyecto.getTarea().getFechaCreaciontarea());
-            //tareaNueva.setPrioridadTarea(tareaDocenteProyecto.getTarea().getPrioridadTarea());
             tareaNueva.setObservacionTarea(tareaDocenteProyecto.getTarea().getObservacionTarea());
             tareaNueva.setEstadoTarea(tareaDocenteProyecto.getTarea().getEstadoTarea());
             tareaNueva.setNombreArchivoTareaEnStorage(tareaDocenteProyecto.getTarea().getNombreArchivoTareaEnStorage());
             tareaNueva.setNombreArchivoTarea(tareaDocenteProyecto.getTarea().getNombreArchivoTarea());
-            //tareaNueva.setPesoTarea(tareaDocenteProyecto.getTarea().getPesoTarea());
-            //tareaNueva.setValorPesoTarea(tareaDocenteProyecto.getTarea().getValorPesoTarea());
             tareaNueva.setIdDocenteRevisor(tareaDocenteProyecto.getTarea().getIdDocenteRevisor());
             tareaNueva.setNombreDocenteRevisor(tareaDocenteProyecto.getTarea().getNombreDocenteRevisor());
             tareaNueva.setPeriodo(tareaDocenteProyecto.getTarea().getPeriodo());
@@ -496,10 +428,7 @@ public class TareaDocenteVinculacionService {
                     indicadorBD.setIndicadorCODIGOINDICADOR(indicador);
                     indicadorBD.setDescripcionTareaIndicador(indicador.getDescripcionIndicador());
                     tareaIndicadors.add(indicadorBD);
-                    // indicadorBD.setTareadocenteCODIGOTAREADOCENTE(tDocenteBD);
-                    // this.tareaIndicadorDao.save(indicadorBD);
                 }
-                // TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
                 t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
 
@@ -556,12 +485,7 @@ public class TareaDocenteVinculacionService {
         for (TareaDocenteVinculacion tareaDocente : tareaDocenteVinculacions) {
             indice = tareaDocenteProyecto.getDocentes().indexOf(tareaDocente.getDocente());
             if (indice == -1) {
-
-                // for (TareaIndicador tIndicador : tareaDocente.getTareaIndicadorList())
-                //     this.tareaIndicadorDao.delete(tIndicador);
-
                 this.tareaDocenteDao.delete(tareaDocente);
-
             } else
                 tareaDocenteProyecto.getDocentes().remove(indice);
         }
@@ -581,10 +505,7 @@ public class TareaDocenteVinculacionService {
                     indicadorBD.setIndicadorCODIGOINDICADOR(indicador);
                     indicadorBD.setDescripcionTareaIndicador(indicador.getDescripcionIndicador());
                     tareaIndicadors.add(indicadorBD);
-                    // indicadorBD.setTareadocenteCODIGOTAREADOCENTE(tDocenteBD);
-                    // this.tareaIndicadorDao.save(indicadorBD);
                 }
-                //TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
                 t.setTareaIndicadorList(tareaIndicadors);
                 this.tareaDocenteDao.save(t);
 
@@ -627,14 +548,8 @@ public class TareaDocenteVinculacionService {
             }
         }
         tareaDocente.setTareaIndicadorList(tareaIndicadors);
-        // for (TareaIndicador tIndicador : tareaIndicadors)
-        //     this.tareaIndicadorDao.save(tIndicador);
-
         tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.EN_REVISION.getValue());
         this.tareaDocenteDao.save(tareaDocente);
-        // Tarea tarea = tareaDocente.getCodigoTarea();
-        // tarea.setEstadoTarea(EstadoTareaEnum.INACTIVE.getValue().charAt(0));
-        // this.tareaDao.save(tarea);
 
         emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
                 "GPR - Actividad: " + tareaDocente.getTarea().getNombreTarea(),
@@ -666,9 +581,7 @@ public class TareaDocenteVinculacionService {
         TareaVinculacion tarea = this.obtenerTareaPorCodigoTarea(codigoTarea);
         List<TareaDocenteVinculacion> tareaDocentes = this.tareaDocenteDao.findByTareaId(codigoTarea);
         for (TareaDocenteVinculacion tareaDocente : tareaDocentes) {
-            // for (TareaIndicador tIndicador : tareaDocente.getTareaIndicadorList())
-            //     this.tareaIndicadorDao.delete(tIndicador);
-            this.tareaDocenteDao.delete(tareaDocente);
+           this.tareaDocenteDao.delete(tareaDocente);
         }
         this.tareaDao.delete(tarea);
     }
